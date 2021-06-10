@@ -30,6 +30,8 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _navIndex = 0;
+  bool _isLoading = false;
+  List<Person> _data;
   List<String> cats = [
     "assets/cat0.jpg",
     "assets/cat1.jpg",
@@ -46,17 +48,21 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+    loadPeople();
   }
 
-  Future<List<Person>> loadPeople() async {
+  void loadPeople() async {
+    setState(() {
+      _isLoading = true;
+    });
+    List<Person> res;
     try {
       final response = await http.get(
           Uri.parse("https://randomuser.me/api/?results=1000&nat=de&noinfo"));
       if (response.statusCode == 200) {
-        List<Person> res = [];
+        res = [];
         for (var person in jsonDecode(response.body)['results'])
           res.add(Person.fromMap(person));
-        return res;
       } else {
         throw Exception(
             'Failed to load people - ${response.statusCode} - ${response.toString()}');
@@ -64,6 +70,10 @@ class _MyHomePageState extends State<MyHomePage> {
     } catch (e) {
       throw Exception('Failed to load people - ${e.toString()}');
     }
+    setState(() {
+      _isLoading = false;
+      _data = res;
+    });
   }
 
   @override
@@ -77,14 +87,8 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       body: _navIndex == 0
-          ? FutureBuilder(
-              future: loadPeople(),
-              builder: (context, snapshot) {
-                if (!snapshot.hasData)
-                  return Center(
-                    child: CircularProgressIndicator(),
-                  );
-                return Column(
+          ? _data != null && _isLoading == false
+              ? Column(
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
@@ -92,7 +96,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         IconButton(
                           icon: Icon(Icons.refresh),
                           onPressed: () {
-                            setState(() {});
+                            loadPeople();
                           },
                         ),
                       ],
@@ -102,7 +106,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         child: Padding(
                           padding: const EdgeInsets.all(12.0),
                           child: Column(
-                            children: snapshot.data
+                            children: _data
                                 .map<Widget>(
                                   (Person item) => Column(
                                     mainAxisSize: MainAxisSize.min,
@@ -143,23 +147,6 @@ class _MyHomePageState extends State<MyHomePage> {
                                                 item.pictureUrl,
                                                 height: 80,
                                                 width: 100,
-                                                frameBuilder: (context,
-                                                    child,
-                                                    frame,
-                                                    wasSynchronouslyLoaded) {
-                                                  if (wasSynchronouslyLoaded ??
-                                                      false) {
-                                                    return child;
-                                                  }
-                                                  return AnimatedOpacity(
-                                                    child: child,
-                                                    opacity:
-                                                        frame == null ? 0 : 1,
-                                                    duration: const Duration(
-                                                        seconds: 1),
-                                                    curve: Curves.easeOut,
-                                                  );
-                                                },
                                               ),
                                             ),
                                             Column(
@@ -189,9 +176,10 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                     ),
                   ],
-                );
-              },
-            )
+                )
+              : Center(
+                  child: CircularProgressIndicator(),
+                )
           : Column(
               children: [
                 Row(
