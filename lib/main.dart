@@ -102,76 +102,71 @@ class _MyHomePageState extends State<MyHomePage> {
                       ],
                     ),
                     Expanded(
-                      child: SingleChildScrollView(
-                        child: Padding(
-                          padding: const EdgeInsets.all(12.0),
-                          child: Column(
-                            children: _data
-                                .map<Widget>(
-                                  (Person item) => Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                      child: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: ListView.builder(
+                          itemBuilder: (context, index) {
+                            Person item = _data[index];
+                            return Column(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(4.0),
+                                  child: Text(
+                                    "${item.firstName} ${item.lastName}",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 22,
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(4.0),
+                                  child: Text(
+                                    item.userName,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w300,
+                                      fontSize: 18,
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(4.0),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
                                     children: [
                                       Padding(
                                         padding: const EdgeInsets.all(4.0),
-                                        child: Text(
-                                          "${item.firstName} ${item.lastName}",
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 22,
+                                        child: Image.network(
+                                          item.pictureUrl,
+                                          height: 80,
+                                          width: 100,
+                                        ),
+                                      ),
+                                      Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceAround,
+                                        children: [
+                                          Text(
+                                            "${item.streetName} ${item.streetNumber}",
                                           ),
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(4.0),
-                                        child: Text(
-                                          item.userName,
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.w300,
-                                            fontSize: 18,
-                                          ),
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(4.0),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceAround,
-                                          children: [
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.all(4.0),
-                                              child: Image.network(
-                                                item.pictureUrl,
-                                                height: 80,
-                                                width: 100,
-                                              ),
-                                            ),
-                                            Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.spaceAround,
-                                              children: [
-                                                Text(
-                                                  "${item.streetName} ${item.streetNumber}",
-                                                ),
-                                                Text(
-                                                  "${item.postCode}, ${item.city}",
-                                                )
-                                              ],
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: 15,
+                                          Text(
+                                            "${item.postCode}, ${item.city}",
+                                          )
+                                        ],
                                       )
                                     ],
                                   ),
+                                ),
+                                SizedBox(
+                                  height: 15,
                                 )
-                                .toList(),
-                          ),
+                              ],
+                            );
+                          },
                         ),
                       ),
                     ),
